@@ -29,14 +29,19 @@ Tanto el código como el diseño del sistema están orientados a facilitar el ap
 git clone https://github.com/juardilad/proyecto_cripto_diffie_hellman.git
 cd proyecto_cripto_diffie_hellman
 ```
-2. Instalar dependencias:
+
+2. Crear entornos e instalar dependencias:
 ```bash
 cd Cliente_Back
+python -m venv venv
+.\venv\Scripts\activate   
 pip install -r requirements.txt
 ```
 
 ```bash
 cd VPN_Back
+python -m venv venv
+.\venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -44,6 +49,7 @@ pip install -r requirements.txt
 cd Front/vite-project
 npm install
 ```
+
 3. Correr el servidor de manera local:
 
 ```bash
@@ -66,6 +72,7 @@ npm run dev
 ```
 
 Acceder a: `http:localhost:5173`
+
 
 ## 📚 Notas educativas
 

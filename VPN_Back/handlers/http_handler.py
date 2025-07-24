@@ -40,7 +40,6 @@ def create_http_handler(use_case, conn_handler=None):
             type = data.get('type')
             encrypted_message = use_case.encrypt_message(message)
             use_case.add_decrypted_message(direction, message, type)
-            use_case.add_encrypted_message(direction, encrypted_message, type)
             conn_handler.send(encrypted_message, type)
             return jsonify({"status": "success"}), 201
         except Exception as e:

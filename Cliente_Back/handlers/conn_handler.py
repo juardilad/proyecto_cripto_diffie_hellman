@@ -80,12 +80,12 @@ class Connection:
                 else:
                     response = requests.post("http://localhost:5050/messages/encrypted", json=payload_received)
                     decrypted_message = self.use_case.decrypt_message(message)
-                    payload_send = {
+                    payload_received = {
                         "direction": "recibido",
                         "message": decrypted_message,
                         "type": msg_type,
                     }
-                    response = requests.post("http://localhost:5050/messages/decrypted", json=payload_send)
+                    response = requests.post("http://localhost:5050/messages/decrypted", json=payload_received)
 
                     print(f"[RECV] {msg_type} - {direction}: {message}")
                     print(f"[RECV Desencriptado] {decrypted_message} - {direction}: {message}")
