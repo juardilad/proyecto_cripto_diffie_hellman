@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import Mensaje from '../components/mensaje';
+import MensajesTodos from '../components/mensajes_todos';
 
 const General = () => {
   const [mensajeServidor, setMensajeServidor] = useState('');
@@ -73,9 +75,9 @@ const General = () => {
   };
 
   return (
-    <div style={{ display: 'flex', gap: '4rem', padding: '2rem' }}>
+    <div className="pantalla-general">
       {/* SERVIDOR */}
-      <div>
+      <div className='columna_sujeto'>
         <h2>Servidor</h2>
         <form onSubmit={enviarServidor}>
           <input
@@ -88,22 +90,14 @@ const General = () => {
         </form>
 
         <h4>Mensajes cifrados</h4>
-        <ul>
-          {mensajesServidorCifrados.map((m, i) => (
-            <li key={i}>{m.direction}: {m.message}</li>
-          ))}
-        </ul>
+        <MensajesTodos mensajes={mensajesServidorCifrados} />
 
         <h4>Mensajes descifrados</h4>
-        <ul>
-          {mensajesServidorDescifrados.map((m, i) => (
-            <li key={i}>{m.direction}: {m.message}</li>
-          ))}
-        </ul>
+        <MensajesTodos mensajes={mensajesServidorDescifrados} />
       </div>
 
       {/* CLIENTE */}
-      <div>
+      <div className="columna_sujeto">
         <h2>Cliente</h2>
         <form onSubmit={enviarCliente}>
           <input
@@ -116,18 +110,10 @@ const General = () => {
         </form>
 
         <h4>Mensajes cifrados</h4>
-        <ul>
-          {mensajesClienteCifrados.map((m, i) => (
-            <li key={i}>{m.direction}: {m.message}</li>
-          ))}
-        </ul>
+         <MensajesTodos mensajes={mensajesClienteCifrados} />
 
         <h4>Mensajes descifrados</h4>
-        <ul>
-          {mensajesClienteDescifrados.map((m, i) => (
-            <li key={i}>{m.direction}: {m.message}</li>
-          ))}
-        </ul>
+        <MensajesTodos mensajes={mensajesClienteDescifrados} />
       </div>
     </div>
   );
