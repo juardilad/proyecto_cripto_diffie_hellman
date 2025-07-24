@@ -23,23 +23,24 @@ class Connection:
         print(f"[Connection] Conectado a {self.host}:{self.port}")
         return self
 
-    def send(self, direction, message, type):
+    def send(self, message, type):
         """Envía un mensaje al socket conectado"""
         if not self.connected:
             raise Exception("No hay conexión activa para enviar")
 
-        payload = {
-            "direction": direction,
+        payload_send = {
+            "direction": "enviado",
             "message": message,
             "type": type,
         }
+        
         if not self.conn:
             raise Exception("No hay conexión activa con el cliente")
 
         try:
-            self.conn.send(json.dumps(payload).encode('utf-8'))
-            response = requests.post("http://localhost:5000/messages/encrypted", json=payload)
-            print(f"[SEND] {payload}")
+            self.conn.send(json.dumps(payload_send).encode('utf-8'))
+            response = requests.post("http://localhost:5000/messages/encrypted", json=payload_send)
+            print(f"[SEND] {payload_send}")
         except Exception as e:
             print(f"[Connection] Error al enviar: {e}")
             raise
@@ -56,29 +57,30 @@ class Connection:
                     break
 
                 decoded = data.decode('utf-8')
-                payload = json.loads(decoded)
+                payload_received = json.loads(decoded)
 
                 direction = "recibido"
-                message = payload.get("message")
-                msg_type = payload.get("type")
+                message = payload_received.get("message")
+                msg_type = payload_received.get("type")
+                payload_received["direction"] = direction
 
-                if msg_type == "key":   
-                    response = requests.post("http://localhost:5000/messages/encrypted", json=payload)
-                    response = requests.post("http://localhost:5000/messages/decrypted", json=payload)
+                if str(msg_type) == "key":
+                    response = requests.post("http://localhost:5000/messages/encrypted", json=payload_received)
+                    response = requests.post("http://localhost:5000/messages/decrypted", json=payload_received)
                     generator = self.use_case.get_generator()
-                    B = int(payload["message"])  # <- La clave pública del cliente
+                    B = int(payload_received["message"])  # <- La clave pública del cliente
                     shared_key = pow(B, generator.a, generator.p)
                     self.use_case.set_key(shared_key)
                     print(f"[RECV] {msg_type} - {direction}: {message}")
                 else:
-                    response = requests.post("http://localhost:5000/messages/encrypted", json=payload)
+                    response = requests.post("http://localhost:5000/messages/encrypted", json=payload_received)
                     decrypted_message = self.use_case.decrypt_message(message)
                     payload2 = {
-                        "direction": direction,
+                        "direction": "enviado",
                         "message": decrypted_message,
                         "type": msg_type,
                     }
-                    response = requests.post("http://localhost:5000/messages/decrypted", json=payload)
+                    response = requests.post("http://localhost:5000/messages/decrypted", json=payload2)
 
                     print(f"[RECV] {msg_type} - {direction}: {message}")
                     print(f"[RECV Desencriptado] {decrypted_message} - {direction}: {message}")

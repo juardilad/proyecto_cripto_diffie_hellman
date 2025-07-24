@@ -3,6 +3,7 @@ from flask_cors import CORS
 from models.message import Message
 from models.memory import Memory 
 from random import randint
+import requests
 
 def create_http_handler(use_case, conn_handler=None):
     app = Flask(__name__)
@@ -12,13 +13,11 @@ def create_http_handler(use_case, conn_handler=None):
     def send_message():
         data = request.json
         try:
-            direction = "enviado"
             message = data.get('message')
             type = data.get('type')
-            use_case.add_decrypted_message(direction, message, type)
             encrypted_message = use_case.encrypt_message(message)
-            use_case.add_encrypted_message(direction, encrypted_message, type)
-            conn_handler.send(direction, encrypted_message, type)
+            use_case.add_decrypted_message("enviado", message, "generator")
+            conn_handler.send(encrypted_message, type)
             return jsonify({"status": "success"}), 201
         except Exception as e:
             return jsonify({"error": str(e)}), 400

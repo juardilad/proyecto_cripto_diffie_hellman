@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models.message import Message
 from models.memory import Memory 
-
+import requests
 from random import randint
 
 def create_http_handler(use_case, conn_handler=None):
@@ -21,8 +21,8 @@ def create_http_handler(use_case, conn_handler=None):
             A = pow(g, a, p )
             use_case.set_generator(g, p, a, A)
             message = f"{g},{p},{A}"
-            use_case.add_encrypted_message("enviado", message, "generator")
-            conn_handler.send("enviado", message, "generator")
+            use_case.add_decrypted_message("enviado", message, "generator")
+            conn_handler.send(message, "generator")
             return jsonify({"status": "generator enviado"}), 200
 
         except Exception as e:
@@ -38,10 +38,10 @@ def create_http_handler(use_case, conn_handler=None):
             direction = "enviado"
             message = data.get('message')
             type = data.get('type')
-            use_case.add_decrypted_message(direction, message, type)
             encrypted_message = use_case.encrypt_message(message)
+            use_case.add_decrypted_message(direction, message, type)
             use_case.add_encrypted_message(direction, encrypted_message, type)
-            conn_handler.send(direction, encrypted_message, type)
+            conn_handler.send(encrypted_message, type)
             return jsonify({"status": "success"}), 201
         except Exception as e:
             print("[ERROR /messages/send]:", str(e))
